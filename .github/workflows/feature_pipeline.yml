@@ -1,0 +1,54 @@
+# .github/workflows/feature_pipeline.yml
+name: Pipeline de Ingeniería de Características
+
+on:
+  schedule:
+    # Ejecutar cada hora
+    - cron: "0 * * * *"
+  workflow_dispatch: # Permite la ejecución manual
+
+jobs:
+  run-feature-engineering:
+    name: Ejecutar Ingeniería de Características
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9' # Asegurarse que coincida con el entorno de desarrollo
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Si el notebook se ejecuta directamente, se necesita nbconvert o similar:
+          # pip install jupyter nbconvert
+          
+      - name: Ejecutar notebook de ingeniería de características
+        run: |
+          # Opción 1: Ejecutar el notebook directamente (requiere nbconvert y papermill o similar)
+          # Asegurarse que el notebook esté diseñado para ejecutarse sin parámetros o con parámetros pasados vía papermill
+          # papermill feature_engineering_notebook.ipynb output_feature_engineering.ipynb -k python3
+          
+          # Opción 2: Convertir a script y ejecutar (preferido para automatización)
+          # En un paso previo (local o en CI), convertir el notebook a .py:
+          # jupyter nbconvert --to script feature_engineering_notebook.ipynb
+          # Luego ejecutar el script:
+          # python feature_engineering_notebook.py 
+          echo "TODO: Implementar la ejecución del notebook/script de ingeniería de características."
+          echo "Por ejemplo: jupyter nbconvert --to script feature_engineering_notebook.ipynb && python feature_engineering_notebook.py"
+          # Este es un placeholder. La ejecución real dependerá de cómo se parametrice el notebook.
+
+      - name: Guardar características procesadas en Feature Store
+        run: |
+          echo "TODO: Implementar el paso para guardar las características en un Feature Store."
+          echo "Ejemplo: python scripts/save_to_feature_store.py --data processed_lending_club_data.csv"
+          # Este script (save_to_feature_store.py) necesitaría ser creado y manejar la lógica de conexión
+          # y carga al Feature Store (Hopsworks, S3, Vertex AI Feature Store, etc.).
+          # El archivo 'processed_lending_club_data.csv' sería la salida del paso anterior.
+          
+      - name: Notificar finalización (Opcional)
+        run: echo "Pipeline de ingeniería de características completado."
