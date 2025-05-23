@@ -32,9 +32,9 @@ jobs:
       - name: Cargar características desde el Feature Store
         run: |
           echo "TODO: Implementar el paso para cargar características desde el Feature Store."
-          echo "Ejemplo: python scripts/load_from_feature_store.py --output_file processed_lending_club_data.csv"
-          # Este script (load_from_feature_store.py) necesitaría ser creado.
-          # Su salida 'processed_lending_club_data.csv' sería la entrada para el notebook/script de entrenamiento.
+          echo "Ejemplo: python scripts/load_from_feature_store.py --output_file data/processed/processed_lending_club_data.csv"
+          # Este script (scripts/load_from_feature_store.py) necesitaría ser creado.
+          # Su salida 'data/processed/processed_lending_club_data.csv' sería la entrada para el notebook/script de entrenamiento.
 
       - name: Configurar MLflow Tracking
         run: |
@@ -58,14 +58,14 @@ jobs:
           # DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           echo "TODO: Implementar la ejecución del notebook/script de entrenamiento de modelo."
-          echo "Ejemplo: jupyter nbconvert --to script model_training_notebook.ipynb && python model_training_notebook.py"
-          # El notebook/script debe usar la variable de entorno MLFLOW_TRACKING_URI para conectarse.
+          echo "Ejemplo: jupyter nbconvert --to script notebooks/model_training_notebook.ipynb --output-dir scripts && python scripts/model_training_notebook.py"
+          # El notebook/script debe usar la variable de entorno MLFLOW_TRACKING_URI para conectarse y guardar el modelo en 'models/trained_model.pkl'.
 
       - name: Registro del Modelo en MLflow Model Registry
         run: |
           echo "TODO: Este paso es conceptual. El registro del modelo usualmente ocurre dentro del script de entrenamiento."
-          echo "El script de entrenamiento (model_training_notebook.py) debería usar mlflow.register_model(...)"
-          echo "después de loguear el modelo con mlflow.sklearn.log_model(...)."
+          echo "El script de entrenamiento (scripts/model_training_notebook.py) debería usar mlflow.register_model(...)"
+          echo "después de loguear el modelo con mlflow.sklearn.log_model(...) usando la ruta 'models/trained_model.pkl'."
           
       - name: Notificar finalización (Opcional)
         run: echo "Pipeline de entrenamiento de modelo completado."

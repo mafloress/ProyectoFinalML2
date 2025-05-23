@@ -11,9 +11,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the inference script, model, and data into the container at /app
-COPY batch_inference_script.py .
-COPY trained_model.pkl .
-COPY processed_lending_club_data.csv . 
+COPY scripts/batch_inference_script.py /app/
+COPY models/trained_model.pkl /app/
+COPY data/processed/processed_lending_club_data.csv /app/
 # Note: Bundling data like this is okay for an exercise. 
 # In production, data would likely be fetched from a DB/S3 or mounted.
 
@@ -21,4 +21,4 @@ COPY processed_lending_club_data.csv .
 # ENV NAME World
 
 # Run batch_inference_script.py when the container launches
-CMD ["python", "batch_inference_script.py"]
+CMD ["python", "/app/batch_inference_script.py"]

@@ -15,21 +15,21 @@ El proyecto está estructurado en un enfoque de tres pipelines principales para 
     *   **Entrada**: Datos crudos de Lending Club (ej. `accepted_2007_to_2018Q4.csv.gz`).
     *   **Proceso**: Este pipeline se encarga de la limpieza de datos, transformación de variables (manejo de fechas, conversión de tipos, etc.), imputación de valores faltantes, codificación de variables categóricas y escalado de características numéricas. También incluye la selección de las características más relevantes.
     *   **Salida**: Un conjunto de datos procesado y listo para el entrenamiento del modelo (ej. `processed_lending_club_data.csv`).
-    *   **Implementación**: `feature_engineering_notebook.ipynb`.
+    *   **Implementación**: `notebooks/feature_engineering_notebook.ipynb`.
 
 2.  **`Pipeline de Entrenamiento (Training Pipeline)`**:
     *   **Entrada**: Conjunto de datos procesado del pipeline de características.
     *   **Proceso**: Divide los datos en conjuntos de entrenamiento y prueba. Compara diferentes algoritmos de clasificación (usando `LazyPredict`), selecciona un modelo final, lo entrena, y evalúa su rendimiento. Utiliza MLflow para el seguimiento de experimentos, parámetros, métricas y el versionado del modelo.
     *   **Salida**: Un modelo entrenado (ej. `trained_model.pkl`) y artefactos registrados en MLflow.
-    *   **Implementación**: `model_training_notebook.ipynb`.
+    *   **Implementación**: `notebooks/model_training_notebook.ipynb`.
 
 3.  **`Pipeline de Inferencia Batch (Batch Inference Pipeline)`**:
     *   **Entrada**: Nuevos datos (con las mismas características procesadas que en el entrenamiento) y el modelo entrenado.
     *   **Proceso**: Carga el modelo entrenado y lo utiliza para generar predicciones (clase y probabilidad de default) sobre un nuevo lote de datos.
     *   **Salida**: Un archivo con las predicciones para el lote de datos (ej. `batch_predictions.csv`).
-    *   **Implementación**: `batch_inference_notebook.ipynb`.
+    *   **Implementación**: `scripts/batch_inference_script.py` (y conceptualmente `notebooks/batch_inference_notebook.ipynb`).
 
-Adicionalmente, se incluye un notebook de Análisis Exploratorio de Datos (`eda_notebook.ipynb`) para una comprensión inicial del dataset.
+Adicionalmente, se incluye un notebook de Análisis Exploratorio de Datos (`notebooks/eda_notebook.ipynb`) para una comprensión inicial del dataset.
 
 ## Decisiones de Modelado
 
@@ -101,31 +101,39 @@ La matriz de confusión, también registrada en MLflow, proporciona una visión 
     ```
 
 4.  **Ejecutar los notebooks en orden**:
-    Se recomienda ejecutar los notebooks en la siguiente secuencia, ya que las salidas de uno son las entradas del siguiente:
+    Asegúrese de que todos los archivos estén organizados según la "Estructura del Proyecto" descrita a continuación antes de ejecutar los scripts o notebooks.
 
-    *   **`download_data.py` (Script de Python, ejecutar primero si los datos no están disponibles)**:
+    Se recomienda ejecutar los scripts/notebooks en la siguiente secuencia:
+
+    *   **`scripts/download_data.py` (Script de Python, ejecutar primero si los datos no están disponibles)**:
         ```bash
-        python download_data.py 
+        python scripts/download_data.py 
         ```
-        Este script utiliza `kagglehub` para descargar el dataset. Asegúrese de tener configuradas sus credenciales de Kaggle (`kaggle.json` en `~/.kaggle/` o las variables de entorno `KAGGLE_USERNAME` y `KAGGLE_KEY`).
+        Este script utiliza `kagglehub` para descargar el dataset. Asegúrese de tener configuradas sus credenciales de Kaggle (`kaggle.json` en `~/.kaggle/` o las variables de entorno `KAGGLE_USERNAME` y `KAGGLE_KEY`). Los datos descargados por `kagglehub` se almacenan en `~/.cache/kagglehub/`. El notebook de ingeniería de características espera encontrar el archivo `accepted_2007_to_2018Q4.csv.gz` en esa ubicación.
 
-    *   **1. `eda_notebook.ipynb`**:
+    *   **1. `notebooks/eda_notebook.ipynb`**:
         *   Propósito: Análisis exploratorio de datos (opcional, pero recomendado para entender los datos).
         *   No genera salidas directas para los siguientes notebooks, pero informa las decisiones de ingeniería de características.
 
-    *   **2. `feature_engineering_notebook.ipynb`**:
+    *   **2. `notebooks/feature_engineering_notebook.ipynb`**:
         *   Propósito: Realiza la limpieza de datos, transformación e ingeniería de características.
-        *   Salida principal: `processed_lending_club_data.csv`.
+        *   Salida principal: `data/processed/processed_lending_club_data.csv`.
 
-    *   **3. `model_training_notebook.ipynb`**:
+    *   **3. `notebooks/model_training_notebook.ipynb`**:
         *   Propósito: Entrena el modelo `LGBMClassifier`, realiza el seguimiento con MLflow y guarda el modelo.
-        *   Entrada: `processed_lending_club_data.csv`.
-        *   Salidas principales: `trained_model.pkl`, experimentos y artefactos en MLflow.
+        *   Entrada: `data/processed/processed_lending_club_data.csv`.
+        *   Salidas principales: `models/trained_model.pkl`, experimentos y artefactos en MLflow.
 
-    *   **4. `batch_inference_notebook.ipynb`**:
+    *   **4. `scripts/batch_inference_script.py` (o `notebooks/batch_inference_notebook.ipynb` para experimentación)**:
         *   Propósito: Demuestra cómo cargar el modelo entrenado y realizar predicciones en un lote de datos.
-        *   Entradas: `trained_model.pkl`, `processed_lending_club_data.csv` (para simular un batch).
-        *   Salida principal: `batch_predictions.csv`.
+        *   Entradas: `models/trained_model.pkl`, `data/processed/processed_lending_club_data.csv` (para simular un batch).
+        *   Salida principal: `data/predictions/batch_predictions.csv`.
+    
+    *   **5. `app/chainlit_app.py` (Aplicación interactiva)**:
+        ```bash
+        chainlit run app/chainlit_app.py -w
+        ```
+        Asegúrese de que `models/trained_model.pkl` y `data/processed/processed_lending_club_data.csv` existan en las rutas correctas relativas al proyecto.
 
 5.  **Visualizar experimentos con MLflow**:
     Desde la terminal, en el directorio raíz del proyecto, ejecute:
@@ -136,22 +144,33 @@ La matriz de confusión, también registrada en MLflow, proporciona una visión 
 
 ## Estructura del Proyecto
 ```
-.
-├── data/                             # (Opcional, si se descargan los datos localmente aquí)
-│   └── ...
-├── mlruns/                           # Directorio generado por MLflow para los experimentos
-├── notebooks/                        # (Alternativa, si los notebooks estuvieran en subdirectorio)
-│   └── ...
-├── eda_notebook.ipynb                # Notebook para Análisis Exploratorio de Datos
-├── feature_engineering_notebook.ipynb # Notebook para Ingeniería de Características
-├── model_training_notebook.ipynb     # Notebook para Entrenamiento del Modelo
-├── batch_inference_notebook.ipynb    # Notebook para Inferencia Batch
-├── download_data.py                  # Script para descargar el dataset usando kagglehub
-├── requirements.txt                  # Dependencias del proyecto
-├── trained_model.pkl                 # Modelo entrenado (salida de model_training)
-├── processed_lending_club_data.csv   # Datos procesados (salida de feature_engineering)
-├── batch_predictions.csv             # Predicciones de ejemplo (salida de batch_inference)
-└── README.md                         # Este archivo
+lending_club_project/
+├── .github/
+│   └── workflows/
+│       ├── feature_pipeline.yml
+│       ├── training_pipeline.yml
+│       └── batch_inference.yml
+├── data/
+│   ├── processed/
+│   │   └── processed_lending_club_data.csv
+│   └── predictions/
+│       └── batch_predictions.csv
+├── notebooks/
+│   ├── eda_notebook.ipynb
+│   ├── feature_engineering_notebook.ipynb
+│   ├── model_training_notebook.ipynb
+│   └── batch_inference_notebook.ipynb
+├── scripts/
+│   ├── download_data.py
+│   └── batch_inference_script.py
+├── app/
+│   └── chainlit_app.py
+├── models/
+│   └── trained_model.pkl
+├── Dockerfile
+├── requirements.txt
+└── README.md
 ```
 
+**Nota**: El script `scripts/download_data.py` se añadió para facilitar la obtención del dataset. El directorio `data/` es donde se almacenan los datos procesados y las predicciones. El directorio `mlruns/` se crea automáticamente por MLflow en el directorio raíz la primera vez que se ejecuta un script con logging de MLflow (si se ejecuta desde el raíz).
 **Nota**: El script `download_data.py` se añadió para facilitar la obtención del dataset, y el directorio `data/` es donde `kagglehub` podría almacenar los datos o donde el usuario podría moverlos. El directorio `mlruns/` se crea automáticamente por MLflow en el directorio raíz la primera vez que se ejecuta un script con logging de MLflow.

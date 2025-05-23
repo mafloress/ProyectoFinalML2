@@ -4,10 +4,10 @@ import pandas as pd
 import os
 
 # --- Configuración de Rutas (ajustar si es necesario) ---
-# Asumimos que los archivos están en el mismo directorio que la app,
-# o en /app/ si se ejecuta en el Docker del paso anterior.
-MODEL_PATH = os.getenv("MODEL_PATH", 'trained_model.pkl')
-DATA_PATH = os.getenv("DATA_PATH", 'processed_lending_club_data.csv')
+# Rutas relativas al directorio raíz del proyecto
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+MODEL_PATH = os.getenv("MODEL_PATH", os.path.join(project_root, 'models/trained_model.pkl'))
+DATA_PATH = os.getenv("DATA_PATH", os.path.join(project_root, 'data/processed/processed_lending_club_data.csv'))
 
 # --- Carga Global de Modelo y Datos ---
 # Estos se cargarán una vez cuando la aplicación Chainlit se inicie.
@@ -37,7 +37,7 @@ try:
     print("Muestra de datos preparada.")
 
 except FileNotFoundError as e:
-    error_message = f"Error de archivo no encontrado: {e}. Asegúrese de que '{MODEL_PATH}' y '{DATA_PATH}' estén disponibles."
+    error_message = f"Error de archivo no encontrado: {e}. Asegúrese de que las rutas sean correctas relativo a la raíz del proyecto."
     print(error_message)
     load_error = error_message
 except Exception as e:

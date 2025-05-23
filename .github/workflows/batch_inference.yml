@@ -33,44 +33,36 @@ jobs:
           MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
         run: |
           echo "TODO: Implementar la carga del modelo de producción desde MLflow Model Registry."
-          echo "Ejemplo: python scripts/load_production_model.py --model_name 'LendingClub_Default_Prod' --output_path 'trained_model.pkl'"
-          # Este script (load_production_model.py) usaría la API de MLflow para descargar el modelo
+          echo "Ejemplo: python scripts/load_production_model.py --model_name 'LendingClub_Default_Prod' --output_path 'models/trained_model.pkl'"
+          # Este script (scripts/load_production_model.py) usaría la API de MLflow para descargar el modelo
           # marcado como 'Production' en el Model Registry.
-          # La salida 'trained_model.pkl' sería usada por el script de inferencia.
+          # La salida 'models/trained_model.pkl' sería usada por el script de inferencia.
 
       - name: Obtener último lote de características desde el Feature Store
         run: |
           echo "TODO: Implementar la obtención del lote de características desde el Feature Store."
-          echo "Ejemplo: python scripts/fetch_feature_batch.py --output_file 'batch_features.csv'"
-          # Este script (fetch_feature_batch.py) se conectaría al Feature Store y obtendría
+          echo "Ejemplo: python scripts/fetch_feature_batch.py --output_file 'data/processed/batch_features.csv'"
+          # Este script (scripts/fetch_feature_batch.py) se conectaría al Feature Store y obtendría
           # los datos más recientes que necesitan predicciones.
-          # La salida 'batch_features.csv' sería la entrada para el script de inferencia,
-          # reemplazando o siendo el 'processed_lending_club_data.csv' en el script actual.
+          # La salida 'data/processed/batch_features.csv' sería la entrada para el script de inferencia.
+          # El script de inferencia debería ser adaptado para leer este archivo en lugar de 'processed_lending_club_data.csv'.
           
       - name: Ejecutar script de inferencia batch
-        # Opción 1: Ejecutar el script de Python directamente (requiere que los datos y modelo estén disponibles localmente)
-        # run: python batch_inference_script.py
-        # Opción 2: Usar Docker si se ha construido una imagen con el script y dependencias
         run: |
           echo "TODO: Implementar la ejecución del script de inferencia."
-          echo "Si se usa Docker:"
-          # echo "docker build -t lendingclub-inference ."
-          # echo "docker run --rm -v $(pwd)/predictions_output:/app/output lendingclub-inference" 
-          # El script batch_inference_script.py necesitaría ser ajustado para leer desde las rutas montadas
-          # y escribir la salida en un directorio que pueda ser montado o copiado.
-          # Por ahora, asumimos que batch_inference_script.py usa 'trained_model.pkl' y 
-          # 'batch_features.csv' (que reemplazaría a 'processed_lending_club_data.csv') 
-          # y genera 'batch_predictions.csv'.
+          # Asumimos que el script `scripts/batch_inference_script.py` ha sido adaptado para:
+          # 1. Cargar el modelo desde 'models/trained_model.pkl'.
+          # 2. Cargar los datos de batch desde 'data/processed/batch_features.csv' (o un path similar).
+          # 3. Guardar las predicciones en 'data/predictions/batch_predictions.csv'.
           echo "Ejecutando script de Python directamente como placeholder:"
-          python batch_inference_script.py 
-          # Asegurarse que batch_inference_script.py esté adaptado para usar los archivos
-          # descargados en los pasos anteriores ('trained_model.pkl' y 'batch_features.csv').
+          python scripts/batch_inference_script.py 
+          # Asegurarse que batch_inference_script.py esté adaptado para usar las rutas correctas.
 
       - name: Guardar predicciones en Base de Datos/S3
         run: |
           echo "TODO: Implementar el paso para guardar las predicciones."
-          echo "Ejemplo: python scripts/save_predictions_to_db.py --predictions_file batch_predictions.csv"
-          # Este script (save_predictions_to_db.py) tomaría 'batch_predictions.csv'
+          echo "Ejemplo: python scripts/save_predictions_to_db.py --predictions_file data/predictions/batch_predictions.csv"
+          # Este script (scripts/save_predictions_to_db.py) tomaría 'data/predictions/batch_predictions.csv'
           # y lo cargaría a un sistema de almacenamiento o base de datos de producción.
 
       - name: Notificar finalización (Opcional)

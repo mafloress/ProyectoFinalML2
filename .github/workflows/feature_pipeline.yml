@@ -30,25 +30,22 @@ jobs:
       - name: Ejecutar notebook de ingeniería de características
         run: |
           # Opción 1: Ejecutar el notebook directamente (requiere nbconvert y papermill o similar)
-          # Asegurarse que el notebook esté diseñado para ejecutarse sin parámetros o con parámetros pasados vía papermill
-          # papermill feature_engineering_notebook.ipynb output_feature_engineering.ipynb -k python3
+          # papermill notebooks/feature_engineering_notebook.ipynb notebooks/output_feature_engineering.ipynb -k python3
           
           # Opción 2: Convertir a script y ejecutar (preferido para automatización)
-          # En un paso previo (local o en CI), convertir el notebook a .py:
-          # jupyter nbconvert --to script feature_engineering_notebook.ipynb
-          # Luego ejecutar el script:
-          # python feature_engineering_notebook.py 
+          # jupyter nbconvert --to script notebooks/feature_engineering_notebook.ipynb --output-dir scripts
+          # python scripts/feature_engineering_notebook.py 
           echo "TODO: Implementar la ejecución del notebook/script de ingeniería de características."
-          echo "Por ejemplo: jupyter nbconvert --to script feature_engineering_notebook.ipynb && python feature_engineering_notebook.py"
-          # Este es un placeholder. La ejecución real dependerá de cómo se parametrice el notebook.
+          echo "Por ejemplo: jupyter nbconvert --to script notebooks/feature_engineering_notebook.ipynb --output-dir scripts && python scripts/feature_engineering_notebook.py"
+          # El notebook debe estar configurado para guardar su salida en 'data/processed/processed_lending_club_data.csv'
 
       - name: Guardar características procesadas en Feature Store
         run: |
           echo "TODO: Implementar el paso para guardar las características en un Feature Store."
-          echo "Ejemplo: python scripts/save_to_feature_store.py --data processed_lending_club_data.csv"
-          # Este script (save_to_feature_store.py) necesitaría ser creado y manejar la lógica de conexión
+          echo "Ejemplo: python scripts/save_to_feature_store.py --data data/processed/processed_lending_club_data.csv"
+          # Este script (scripts/save_to_feature_store.py) necesitaría ser creado y manejar la lógica de conexión
           # y carga al Feature Store (Hopsworks, S3, Vertex AI Feature Store, etc.).
-          # El archivo 'processed_lending_club_data.csv' sería la salida del paso anterior.
+          # El archivo 'data/processed/processed_lending_club_data.csv' sería la salida del paso anterior.
           
       - name: Notificar finalización (Opcional)
         run: echo "Pipeline de ingeniería de características completado."
