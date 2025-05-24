@@ -1,4 +1,5 @@
 # Estimación de Pérdidas en Préstamos Incobrables de Lending Club
+Miguel Ángel Flores Saldívar
 
 ## Uso de LLMs y Agentes IA
 Se utilizaron los siguientes LLMs para poder tomar ideas para tomar la base del proyecto y buscar fuentes reales de datos para el proyecto, se hizo la comparativa entre cada respuesta de cada uno y se escogío la mas ad hoc:
