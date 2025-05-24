@@ -1,5 +1,15 @@
 # Estimación de Pérdidas en Préstamos Incobrables de Lending Club
 
+## Uso de LLMs y Agentes IA
+Se utilizaron los siguientes LLMs para poder tomar ideas para tomar la base del proyecto y buscar fuentes reales de datos para el proyecto, se hizo la comparativa entre cada respuesta de cada uno y se escogío la mas ad hoc:
+- Gemini
+- Copilot
+- Deepseek
+- ChatGPT
+
+Se utilizó adicional para documentación e implementación en Github:
+- Jules Google
+
 ## Objetivo del Proyecto
 El objetivo principal de este proyecto es analizar los datos de préstamos de Lending Club para construir un modelo de aprendizaje automático capaz de predecir la probabilidad de que un préstamo entre en incumplimiento (default). Esto permite estimar las pérdidas potenciales en préstamos que se consideran incobrables y ayuda en la toma de decisiones crediticias.
 
